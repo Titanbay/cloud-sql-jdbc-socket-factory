@@ -946,8 +946,8 @@ public class ConnectorTest extends CloudSqlCoreTestingBase {
 
     @Override
     public InetAddress resolveIp(String domainName) throws UnknownHostException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'resolveIp'");
+      // TODO Auto-generated method stub
+      throw new UnsupportedOperationException("Unimplemented method 'resolveIp'");
     }
   }
 
@@ -981,8 +981,8 @@ public class ConnectorTest extends CloudSqlCoreTestingBase {
 
     @Override
     public InetAddress resolveIp(String domainName) throws UnknownHostException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'resolveIp'");
+      // TODO Auto-generated method stub
+      throw new UnsupportedOperationException("Unimplemented method 'resolveIp'");
     }
   }
 }
