@@ -48,7 +48,8 @@ jobs:
         with:
           name: cloud-sql-connector-java-${{ matrix.artifact_suffix }}
           # Assuming the fat JAR is produced in the core module's target directory
-          path: core/target/*-jar-with-dependencies.jar
+          #path: core/target/*-jar-with-dependencies.jar
+          path: ./**/target/*-jar-with-dependencies.jar # Pattern to find the built JARs in module target directories
           if-no-files-found: error # Error if the JAR is not found
 
 
