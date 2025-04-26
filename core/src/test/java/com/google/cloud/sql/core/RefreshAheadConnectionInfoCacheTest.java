@@ -38,11 +38,11 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.naming.NameNotFoundException;
 import javax.net.ssl.KeyManagerFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import javax.naming.NameNotFoundException;
 
 public class RefreshAheadConnectionInfoCacheTest {
 

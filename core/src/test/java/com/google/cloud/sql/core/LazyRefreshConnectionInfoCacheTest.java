@@ -20,12 +20,12 @@ import static com.google.common.truth.Truth.assertThat;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.security.KeyPair;
-import java.util.concurrent.ExecutionException;
-import org.junit.Before;
-import org.junit.Test;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.ExecutionException;
 import javax.naming.NameNotFoundException;
+import org.junit.Before;
+import org.junit.Test;
 
 public class LazyRefreshConnectionInfoCacheTest {
   private ListenableFuture<KeyPair> keyPairFuture;
