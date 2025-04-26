@@ -20,11 +20,11 @@ import com.google.cloud.sql.IpType;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.net.ssl.SSLContext;
 import javax.naming.NamingException;
-import java.util.Collection;
+import javax.net.ssl.SSLContext;
 
 /** Represents the results of a certificate and metadata refresh operation. */
 class ConnectionInfo {
@@ -98,7 +98,9 @@ class ConnectionInfo {
             String.format(
                 "[%s] Cloud SQL instance  does not have any IP addresses matching preferences (%s)",
                 instanceName.getConnectionName(),
-                config.getIpTypes().stream().map(IpType::toString).collect(Collectors.joining(","))));
+                config.getIpTypes().stream()
+                    .map(IpType::toString)
+                    .collect(Collectors.joining(","))));
       }
     }
 
