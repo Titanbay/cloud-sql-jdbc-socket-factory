@@ -220,6 +220,8 @@ class Connector {
   private ConnectionInfoCache createConnectionInfo(ConnectionConfig config) {
     logger.debug(
         String.format("[%s] Connection info added to cache.", config.getCloudSqlInstance()));
+    // Create the DnsResolver instance
+    DnsResolver dnsResolver = new JndiDnsResolver();
     if (config.getConnectorConfig().getRefreshStrategy() == RefreshStrategy.LAZY) {
       // Resolve the key operation immediately.
       KeyPair keyPair = null;
@@ -229,11 +231,17 @@ class Connector {
         throw new RuntimeException(e);
       }
       return new LazyRefreshConnectionInfoCache(
-          config, adminApi, instanceCredentialFactory, keyPair);
+          config, adminApi, instanceCredentialFactory, dnsResolver, keyPair);
 
     } else {
       return new RefreshAheadConnectionInfoCache(
-          config, adminApi, instanceCredentialFactory, executor, localKeyPair, minRefreshDelayMs);
+          config,
+          adminApi,
+          instanceCredentialFactory,
+          executor,
+          dnsResolver,
+          localKeyPair,
+          minRefreshDelayMs);
     }
   }
 

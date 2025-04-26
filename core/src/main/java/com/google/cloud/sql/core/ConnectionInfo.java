@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
 import javax.naming.NamingException;
+import java.util.Collection;
 
 /** Represents the results of a certificate and metadata refresh operation. */
 class ConnectionInfo {
@@ -64,7 +65,18 @@ class ConnectionInfo {
       try {
         // TODO(b/346609939): Consider returning multiple addresses from DNS resolver.
         String dnsName = instanceMetadata.getDnsName();
-        InetAddress inetAddress = dnsResolver.resolve(dnsName);
+        Collection<String> ipAddresses = dnsResolver.resolveTxt(dnsName);
+        if (ipAddresses.isEmpty()) {
+          throw new RuntimeException(
+              String.format(
+                  "[%s] Unable to resolve PSC DNS name: %s. No IP addresses found.",
+                  instanceName.getConnectionName(), instanceMetadata.getDnsName()));
+        }
+        // Use the first IP address returned by the DNS resolver.
+        String ipAddress = ipAddresses.iterator().next();
+        // Resolve the string IP address to an InetAddress object.
+        // This primarily validates the format, as it might not perform a network lookup.
+        InetAddress inetAddress = InetAddress.getByName(ipAddress);
         preferredIp = inetAddress.getHostAddress();
       } catch (UnknownHostException | NamingException e) {
         throw new RuntimeException(
