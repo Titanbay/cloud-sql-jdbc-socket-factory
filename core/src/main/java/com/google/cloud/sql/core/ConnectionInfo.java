@@ -17,10 +17,13 @@
 package com.google.cloud.sql.core;
 
 import com.google.cloud.sql.IpType;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Collectors;
 import javax.net.ssl.SSLContext;
+import javax.naming.NamingException;
 
 /** Represents the results of a certificate and metadata refresh operation. */
 class ConnectionInfo {
@@ -54,21 +57,37 @@ class ConnectionInfo {
   }
 
   ConnectionMetadata toConnectionMetadata(
-      ConnectionConfig config, CloudSqlInstanceName instanceName) {
-    String preferredIp = null;
+      ConnectionConfig config, CloudSqlInstanceName instanceName, DnsResolver dnsResolver) {
+    String preferredIp;
 
-    for (IpType ipType : config.getIpTypes()) {
-      preferredIp = getIpAddrs().get(ipType);
-      if (preferredIp != null) {
-        break;
+    if (instanceMetadata.isPscEnabled()) {
+      try {
+        // TODO(b/346609939): Consider returning multiple addresses from DNS resolver.
+        String dnsName = instanceMetadata.getDnsName();
+        InetAddress inetAddress = dnsResolver.resolve(dnsName);
+        preferredIp = inetAddress.getHostAddress();
+      } catch (UnknownHostException | NamingException e) {
+        throw new RuntimeException(
+            String.format(
+                "[%s] Unable to resolve PSC DNS name: %s",
+                instanceName.getConnectionName(), instanceMetadata.getDnsName()),
+            e);
       }
-    }
-    if (preferredIp == null) {
-      throw new IllegalArgumentException(
-          String.format(
-              "[%s] Cloud SQL instance  does not have any IP addresses matching preferences (%s)",
-              instanceName.getConnectionName(),
-              config.getIpTypes().stream().map(IpType::toString).collect(Collectors.joining(","))));
+    } else {
+      preferredIp = null;
+      for (IpType ipType : config.getIpTypes()) {
+        preferredIp = getIpAddrs().get(ipType);
+        if (preferredIp != null) {
+          break;
+        }
+      }
+      if (preferredIp == null) {
+        throw new IllegalArgumentException(
+            String.format(
+                "[%s] Cloud SQL instance  does not have any IP addresses matching preferences (%s)",
+                instanceName.getConnectionName(),
+                config.getIpTypes().stream().map(IpType::toString).collect(Collectors.joining(","))));
+      }
     }
 
     return new ConnectionMetadata(

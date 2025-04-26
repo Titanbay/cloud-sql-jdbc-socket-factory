@@ -28,6 +28,7 @@ import java.security.KeyPair;
 class LazyRefreshConnectionInfoCache implements ConnectionInfoCache {
   private final ConnectionConfig config;
   private final CloudSqlInstanceName instanceName;
+  private final DnsResolver dnsResolver;
 
   private final LazyRefreshStrategy refreshStrategy;
 
@@ -37,12 +38,15 @@ class LazyRefreshConnectionInfoCache implements ConnectionInfoCache {
    *
    * @param config instance connection name in the format "PROJECT_ID:REGION_ID:INSTANCE_ID"
    * @param connectionInfoRepository Service class for interacting with the Cloud SQL Admin API
+   * @param tokenSourceFactory Used to create OAuth2 access tokens for the Cloud SQL Admin API.
+   * @param dnsResolver Used to perform DNS lookups.
    * @param keyPair public/private key pair used to authenticate connections
    */
   public LazyRefreshConnectionInfoCache(
       ConnectionConfig config,
       ConnectionInfoRepository connectionInfoRepository,
       CredentialFactory tokenSourceFactory,
+      DnsResolver dnsResolver,
       KeyPair keyPair) {
 
     CloudSqlInstanceName instanceName =
@@ -50,6 +54,7 @@ class LazyRefreshConnectionInfoCache implements ConnectionInfoCache {
 
     this.config = config;
     this.instanceName = instanceName;
+    this.dnsResolver = dnsResolver;
 
     AccessTokenSupplier accessTokenSupplier =
         DefaultAccessTokenSupplier.newInstance(config.getAuthType(), tokenSourceFactory);
@@ -65,7 +70,9 @@ class LazyRefreshConnectionInfoCache implements ConnectionInfoCache {
 
   @Override
   public ConnectionMetadata getConnectionMetadata(long timeoutMs) {
-    return refreshStrategy.getConnectionInfo(timeoutMs).toConnectionMetadata(config, instanceName);
+    return refreshStrategy
+        .getConnectionInfo(timeoutMs)
+        .toConnectionMetadata(config, instanceName, dnsResolver);
   }
 
   @Override

@@ -29,6 +29,7 @@ class RefreshAheadConnectionInfoCache implements ConnectionInfoCache {
 
   private final ConnectionConfig config;
   private final CloudSqlInstanceName instanceName;
+  private final DnsResolver dnsResolver;
   private final RefreshAheadStrategy refreshStrategy;
 
   /**
@@ -38,14 +39,18 @@ class RefreshAheadConnectionInfoCache implements ConnectionInfoCache {
    *
    * @param config instance connection name in the format "PROJECT_ID:REGION_ID:INSTANCE_ID"
    * @param connectionInfoRepository Service class for interacting with the Cloud SQL Admin API
+   * @param tokenSourceFactory Used to create OAuth2 access tokens for the Cloud SQL Admin API.
    * @param executor executor used to schedule asynchronous tasks
+   * @param dnsResolver Used to perform DNS lookups.
    * @param keyPair public/private key pair used to authenticate connections
+   * @param minRefreshDelayMs Minimum time between refresh attempts.
    */
   public RefreshAheadConnectionInfoCache(
       ConnectionConfig config,
       ConnectionInfoRepository connectionInfoRepository,
       CredentialFactory tokenSourceFactory,
       ListeningScheduledExecutorService executor,
+      DnsResolver dnsResolver,
       ListenableFuture<KeyPair> keyPair,
       long minRefreshDelayMs) {
 
@@ -54,6 +59,7 @@ class RefreshAheadConnectionInfoCache implements ConnectionInfoCache {
 
     this.config = config;
     this.instanceName = instanceName;
+    this.dnsResolver = dnsResolver;
 
     AccessTokenSupplier accessTokenSupplier =
         DefaultAccessTokenSupplier.newInstance(config.getAuthType(), tokenSourceFactory);
@@ -70,7 +76,9 @@ class RefreshAheadConnectionInfoCache implements ConnectionInfoCache {
 
   @Override
   public ConnectionMetadata getConnectionMetadata(long timeoutMs) {
-    return refreshStrategy.getConnectionInfo(timeoutMs).toConnectionMetadata(config, instanceName);
+    return refreshStrategy
+        .getConnectionInfo(timeoutMs)
+        .toConnectionMetadata(config, instanceName, dnsResolver);
   }
 
   @Override
