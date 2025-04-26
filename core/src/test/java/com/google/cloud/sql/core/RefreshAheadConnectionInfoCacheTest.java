@@ -25,6 +25,8 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
@@ -63,6 +65,12 @@ public class RefreshAheadConnectionInfoCacheTest {
     public Collection<String> resolveTxt(String domainName) throws NameNotFoundException {
       // Return a dummy IP address for testing purposes.
       return Collections.singletonList("10.0.0.1");
+    }
+
+    @Override
+    public InetAddress resolveIp(String domainName) throws UnknownHostException {
+      // Return a dummy InetAddress for testing purposes.
+      return InetAddress.getByName("10.0.0.1");
     }
   }
 

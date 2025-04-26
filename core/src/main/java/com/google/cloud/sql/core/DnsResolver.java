@@ -16,10 +16,21 @@
 
 package com.google.cloud.sql.core;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import javax.naming.NameNotFoundException;
 
 /** Wraps the Java DNS API. */
 interface DnsResolver {
   Collection<String> resolveTxt(String domainName) throws NameNotFoundException;
+
+  /**
+   * Resolves the provided domain name to an IP address.
+   *
+   * @param domainName the domain name to resolve.
+   * @return the resolved InetAddress.
+   * @throws UnknownHostException if the domain name cannot be resolved.
+   */
+  InetAddress resolveIp(String domainName) throws UnknownHostException;
 }

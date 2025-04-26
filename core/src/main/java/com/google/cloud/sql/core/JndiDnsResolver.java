@@ -16,6 +16,8 @@
 
 package com.google.cloud.sql.core;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -78,5 +80,24 @@ class JndiDnsResolver implements DnsResolver {
     } catch (NamingException e) {
       throw new RuntimeException("Unable to look up domain name " + domainName, e);
     }
+  }
+
+  /**
+   * Resolves the provided domain name to an IP address using {@link InetAddress#getAllByName}.
+   *
+   * @param domainName the domain name to resolve.
+   * @return the first resolved InetAddress.
+   * @throws UnknownHostException if the domain name cannot be resolved.
+   */
+  @Override
+  public InetAddress resolveIp(String domainName) throws UnknownHostException {
+    // Using InetAddress.getAllByName is generally preferred for standard A/AAAA lookups.
+    // It uses the OS's name resolution mechanism.
+    InetAddress[] addresses = InetAddress.getAllByName(domainName);
+    if (addresses == null || addresses.length == 0) {
+      throw new UnknownHostException("No IP addresses found for domain name: " + domainName);
+    }
+    // Return the first address found.
+    return addresses[0];
   }
 }

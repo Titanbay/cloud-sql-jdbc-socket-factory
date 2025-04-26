@@ -19,6 +19,8 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.KeyPair;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +40,12 @@ public class LazyRefreshConnectionInfoCacheTest {
     public Collection<String> resolveTxt(String domainName) throws NameNotFoundException {
       // Return a dummy IP address for testing purposes.
       return Collections.singletonList("10.0.0.1");
+    }
+
+    @Override
+    public InetAddress resolveIp(String domainName) throws UnknownHostException {
+      // Return a dummy InetAddress for testing purposes.
+      return InetAddress.getByName("10.0.0.1");
     }
   }
 
