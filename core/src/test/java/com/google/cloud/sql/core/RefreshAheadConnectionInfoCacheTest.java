@@ -30,6 +30,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,6 +42,7 @@ import javax.net.ssl.KeyManagerFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import javax.naming.NameNotFoundException;
 
 public class RefreshAheadConnectionInfoCacheTest {
 
@@ -54,6 +56,15 @@ public class RefreshAheadConnectionInfoCacheTest {
   private ListenableFuture<KeyPair> keyPairFuture;
 
   private final long RATE_LIMIT_BETWEEN_REQUESTS = 10L;
+
+  // Stub DnsResolver for testing.
+  private static class StubDnsResolver implements DnsResolver {
+    @Override
+    public Collection<String> resolveTxt(String domainName) throws NameNotFoundException {
+      // Return a dummy IP address for testing purposes.
+      return Collections.singletonList("10.0.0.1");
+    }
+  }
 
   @Before
   public void setup() throws Exception {
@@ -77,6 +88,7 @@ public class RefreshAheadConnectionInfoCacheTest {
             instanceDataSupplier,
             stubCredentialFactory,
             executorService,
+            new StubDnsResolver(),
             keyPairFuture,
             MIN_REFERSH_DELAY_MS);
 
@@ -109,6 +121,7 @@ public class RefreshAheadConnectionInfoCacheTest {
             connectionInfoRepository,
             stubCredentialFactory,
             executorService,
+            new StubDnsResolver(),
             keyPairFuture,
             MIN_REFERSH_DELAY_MS);
 
@@ -144,6 +157,7 @@ public class RefreshAheadConnectionInfoCacheTest {
             connectionInfoRepository,
             stubCredentialFactory,
             executorService,
+            new StubDnsResolver(),
             keyPairFuture,
             100);
 
@@ -183,6 +197,7 @@ public class RefreshAheadConnectionInfoCacheTest {
             connectionInfoRepository,
             stubCredentialFactory,
             executorService,
+            new StubDnsResolver(),
             keyPairFuture,
             MIN_REFERSH_DELAY_MS);
 
@@ -236,6 +251,7 @@ public class RefreshAheadConnectionInfoCacheTest {
             connectionInfoRepository,
             stubCredentialFactory,
             executorService,
+            new StubDnsResolver(),
             keyPairFuture,
             RATE_LIMIT_BETWEEN_REQUESTS);
 
@@ -309,6 +325,7 @@ public class RefreshAheadConnectionInfoCacheTest {
             connectionInfoRepository,
             stubCredentialFactory,
             executorService,
+            new StubDnsResolver(),
             keyPairFuture,
             RATE_LIMIT_BETWEEN_REQUESTS);
 
@@ -378,6 +395,7 @@ public class RefreshAheadConnectionInfoCacheTest {
             connectionInfoRepository,
             stubCredentialFactory,
             executorService,
+            new StubDnsResolver(),
             keyPairFuture,
             RATE_LIMIT_BETWEEN_REQUESTS);
 
@@ -451,6 +469,7 @@ public class RefreshAheadConnectionInfoCacheTest {
             connectionInfoRepository,
             stubCredentialFactory,
             executorService,
+            new StubDnsResolver(),
             keyPairFuture,
             RATE_LIMIT_BETWEEN_REQUESTS);
 
@@ -528,6 +547,7 @@ public class RefreshAheadConnectionInfoCacheTest {
             connectionInfoRepository,
             stubCredentialFactory,
             executorService,
+            new StubDnsResolver(),
             keyPairFuture,
             RATE_LIMIT_BETWEEN_REQUESTS);
 
@@ -620,6 +640,7 @@ public class RefreshAheadConnectionInfoCacheTest {
                   connectionInfoRepository,
                   stubCredentialFactory,
                   executorService,
+                  new StubDnsResolver(),
                   keyPairFuture,
                   MIN_REFERSH_DELAY_MS);
 
@@ -671,6 +692,7 @@ public class RefreshAheadConnectionInfoCacheTest {
             connectionInfoRepository,
             stubCredentialFactory,
             executorService,
+            new StubDnsResolver(),
             keyPairFuture,
             MIN_REFERSH_DELAY_MS);
     assertThrows(
@@ -688,6 +710,7 @@ public class RefreshAheadConnectionInfoCacheTest {
             instanceDataSupplier,
             stubCredentialFactory,
             executorService,
+            new StubDnsResolver(),
             keyPairFuture,
             MIN_REFERSH_DELAY_MS);
     instance.close();
@@ -729,6 +752,7 @@ public class RefreshAheadConnectionInfoCacheTest {
             connectionInfoRepository,
             stubCredentialFactory,
             executorService,
+            new StubDnsResolver(),
             keyPairFuture,
             MIN_REFERSH_DELAY_MS);
 

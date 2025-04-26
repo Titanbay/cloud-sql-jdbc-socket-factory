@@ -23,11 +23,23 @@ import java.security.KeyPair;
 import java.util.concurrent.ExecutionException;
 import org.junit.Before;
 import org.junit.Test;
+import java.util.Collection;
+import java.util.Collections;
+import javax.naming.NameNotFoundException;
 
 public class LazyRefreshConnectionInfoCacheTest {
   private ListenableFuture<KeyPair> keyPairFuture;
   private final StubCredentialFactory stubCredentialFactory =
       new StubCredentialFactory("my-token", System.currentTimeMillis() + 3600L);
+
+  // Stub DnsResolver for testing.
+  private static class StubDnsResolver implements DnsResolver {
+    @Override
+    public Collection<String> resolveTxt(String domainName) throws NameNotFoundException {
+      // Return a dummy IP address for testing purposes.
+      return Collections.singletonList("10.0.0.1");
+    }
+  }
 
   @Before
   public void setup() throws Exception {
@@ -47,6 +59,7 @@ public class LazyRefreshConnectionInfoCacheTest {
             new ConnectionConfig.Builder().withCloudSqlInstance("project:region:instance").build(),
             instanceDataSupplier,
             stubCredentialFactory,
+            new StubDnsResolver(),
             kp);
 
     ConnectionMetadata gotMetadata = connectionInfoCache.getConnectionMetadata(300);

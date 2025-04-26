@@ -27,8 +27,13 @@ import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import java.io.IOException;
 import java.security.KeyPair;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.naming.NameNotFoundException;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +45,14 @@ public class RefreshAheadConnectionInfoCacheConcurrencyTest {
   private static final Logger logger =
       LoggerFactory.getLogger(RefreshAheadConnectionInfoCacheConcurrencyTest.class);
   public static final int FORCE_REFRESH_COUNT = 10;
+
+  private static class StubDnsResolver implements DnsResolver {
+    @Override
+    public Collection<String> resolveTxt(String domainName) throws NameNotFoundException {
+      // Return a dummy IP address for testing purposes.
+      return Collections.singletonList("10.0.0.1");
+    }
+  }
 
   private static class TestCredentialFactory implements CredentialFactory, HttpRequestInitializer {
 
@@ -73,6 +86,7 @@ public class RefreshAheadConnectionInfoCacheConcurrencyTest {
               supplier,
               new TestCredentialFactory(),
               executor,
+              new StubDnsResolver(),
               keyPairFuture,
               refreshDelayMs));
     }
