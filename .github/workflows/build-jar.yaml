@@ -50,3 +50,5 @@ jobs:
           # Assuming the fat JAR is produced in the core module's target directory
           path: core/target/*-jar-with-dependencies.jar
           if-no-files-found: error # Error if the JAR is not found
+
+
