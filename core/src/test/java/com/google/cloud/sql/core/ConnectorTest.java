@@ -31,7 +31,9 @@ import com.google.common.util.concurrent.ListeningScheduledExecutorService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.PrivateKey;
@@ -941,6 +943,12 @@ public class ConnectorTest extends CloudSqlCoreTestingBase {
       }
       throw new NameNotFoundException("Not found: " + domainName);
     }
+
+    @Override
+    public InetAddress resolveIp(String domainName) throws UnknownHostException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'resolveIp'");
+    }
   }
 
   private static class MutableDnsResolver implements DnsResolver {
@@ -969,6 +977,12 @@ public class ConnectorTest extends CloudSqlCoreTestingBase {
         return Collections.singletonList(this.instanceName);
       }
       throw new NameNotFoundException("Not found: " + domainName);
+    }
+
+    @Override
+    public InetAddress resolveIp(String domainName) throws UnknownHostException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'resolveIp'");
     }
   }
 }
