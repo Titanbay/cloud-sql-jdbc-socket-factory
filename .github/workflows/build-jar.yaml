@@ -1,0 +1,52 @@
+name: Build Connector JAR
+
+on:
+  push:
+    branches: [ main, bug/ip-address-resolution-for-psc-endpoint ]
+  pull_request:
+    branches: [ main ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: amd64
+            artifact_suffix: amd64
+          - os: macos-latest # Apple Silicon runner
+            arch: arm64
+            artifact_suffix: arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 for ${{ matrix.arch }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          architecture: ${{ matrix.arch == 'arm64' && startsWith(matrix.os, 'macos') && 'aarch64' || 'x64' }}
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build with Maven
+        # Run from the root, Maven should handle submodules
+        run: mvn -B -P jar-with-dependencies clean package -DskipTests
+
+      - name: Upload JAR Artifact (${{ matrix.arch }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloud-sql-connector-java-${{ matrix.artifact_suffix }}
+          # Assuming the fat JAR is produced in the core module's target directory
+          path: core/target/*-jar-with-dependencies.jar
+          if-no-files-found: error # Error if the JAR is not found
